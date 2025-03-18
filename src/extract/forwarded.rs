@@ -139,6 +139,22 @@ impl Forward {
             proto,
         }
     }
+
+    pub fn by(&self) -> &Option<Interface> {
+        &self.by
+    }
+
+    pub fn r#for(&self) -> &Option<Interface> {
+        &self.r#for
+    }
+
+    pub fn host(&self) -> &Option<String> {
+        &self.host
+    }
+
+    pub fn proto(&self) -> &Option<Proto> {
+        &self.proto
+    }
 }
 
 /// Get the contents of the `Forwarded` header.
@@ -160,6 +176,10 @@ pub struct Forwarded {
 impl Forwarded {
     pub fn new(forwards: Vec<Forward>) -> Self {
         Self { forwards }
+    }
+
+    pub fn forwards(&self) -> &Vec<Forward> {
+        &self.forwards
     }
 }
 

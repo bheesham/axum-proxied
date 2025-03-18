@@ -21,7 +21,7 @@ use std::net::IpAddr;
 /// ```
 #[derive(Debug, PartialEq, Eq)]
 pub struct XForwardedFor {
-    ip_addresses: Vec<IpAddr>,
+    forwards: Vec<IpAddr>,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -34,8 +34,12 @@ impl IntoResponse for XForwardedForRejection {
 }
 
 impl XForwardedFor {
-    pub fn new(ip_addresses: Vec<std::net::IpAddr>) -> Self {
-        Self { ip_addresses }
+    pub fn new(forwards: Vec<std::net::IpAddr>) -> Self {
+        Self { forwards }
+    }
+
+    pub fn forwards(&self) -> &Vec<IpAddr> {
+        &self.forwards
     }
 }
 
@@ -58,7 +62,7 @@ where
         let Ok(header_str) = header_raw.to_str() else {
             return Err(XForwardedForRejection("could not parse header into string"));
         };
-        let mut ip_addresses = vec![];
+        let mut forwards = vec![];
         let ips_raw = header_str.split(',');
         for ip_raw in ips_raw {
             let Ok(ip) = ip_raw.trim().parse::<std::net::IpAddr>() else {
@@ -66,9 +70,9 @@ where
                     "could not parse IP in HTTP Header X-Forwarded-For (axum-stuff)",
                 ));
             };
-            ip_addresses.push(ip);
+            forwards.push(ip);
         }
-        Ok(Some(XForwardedFor::new(ip_addresses)))
+        Ok(Some(XForwardedFor::new(forwards)))
     }
 }
 
@@ -93,7 +97,7 @@ mod tests {
         assert_eq!(
             xforwarded,
             XForwardedFor {
-                ip_addresses: vec![
+                forwards: vec![
                     "192.0.2.43".parse::<IpAddr>().expect("???"),
                     "2001:db8:cafe::17".parse::<IpAddr>().expect("???"),
                 ]
