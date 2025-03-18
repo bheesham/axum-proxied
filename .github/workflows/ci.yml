@@ -1,0 +1,23 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ubuntu-24.04
+    outputs:
+      image: ${{ steps.build.outputs.image }}
+    steps:
+      - name: Check out the repository to the runner
+        uses: actions/checkout@v4  
+      - name: Build
+        id: build
+        run: cargo b --examples
+      - name: Test extract
+        id: test-extract
+        run: sh ci/extract.sh
+      - name: Test proxy
+        id: test-proxy
+        run: sh ci/proxy.sh

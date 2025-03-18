@@ -1,5 +1,7 @@
 # axum-proxied
 
+[![CI](https://github.com/bheesham/axum-proxied/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/bheesham/axum-proxied/actions)
+
 Helpers for running an [axum] service behind a reverse proxy.
 
 Features:
