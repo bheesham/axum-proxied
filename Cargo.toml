@@ -1,7 +1,21 @@
 [package]
 name = "axum-proxied"
+description = "Helpers for running axum behind a reverse proxy."
 version = "0.1.0"
 edition = "2024"
+license = "Apache-2.0 OR MIT"
+readme = "README.md"
+repository = "https://github.com/bheesham/axum-proxied"
+keywords = ["axum", "proxy"]
+categories = ["http"]
+include = [
+  "/src",
+  "/examples",
+  "/Cargo.toml",
+  "/README.md",
+  "/LICENSE-APACHE",
+  "/LICENSE-MIT",
+]
 
 [dependencies]
 axum = { version = "0.8.1", default-features = false, features = ["tokio"] }
