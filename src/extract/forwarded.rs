@@ -124,7 +124,7 @@ impl FromStr for Interface {
         match (ipv6, port) {
             (Some(ip), Some(port)) => Ok(Self::Socket(SocketAddr::from((ip, port)))),
             (Some(ip), None) => Ok(Self::Socket(SocketAddr::from((ip, 0)))),
-            _ => Ok(Self::Identifier(String::from(s_trimmed))),
+            _ => Ok(Self::Identifier(String::from(s_trimmed.trim_matches('"')))),
         }
     }
 }
@@ -214,20 +214,14 @@ where
                     params.next().map(|s| s.trim()),
                     params.next().map(|s| s.trim()),
                 ) {
-                    match keyword {
-                        "by" => {
-                            by = value.trim().parse::<Interface>().ok();
-                        }
-                        "for" => {
-                            r#for = value.trim().parse::<Interface>().ok();
-                        }
-                        "host" => {
-                            host = Some(String::from(value.trim()));
-                        }
-                        "proto" => {
-                            proto = value.trim().parse::<Proto>().ok();
-                        }
-                        _ => {}
+                    if keyword.eq_ignore_ascii_case("by") {
+                        by = value.trim().parse::<Interface>().ok();
+                    } else if keyword.eq_ignore_ascii_case("for") {
+                        r#for = value.trim().parse::<Interface>().ok();
+                    } else if keyword.eq_ignore_ascii_case("host") {
+                        host = Some(String::from(value.trim()));
+                    } else if keyword.eq_ignore_ascii_case("proto") {
+                        proto = value.trim().parse::<Proto>().ok();
                     }
                 }
             }
