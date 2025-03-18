@@ -7,7 +7,7 @@ use axum::http::request::Parts;
 use axum::http::{StatusCode, header};
 use axum::response::{IntoResponse, Response};
 use std::convert::Infallible;
-use std::net::{Ipv4Addr, Ipv6Addr, SocketAddr};
+use std::net::{IpAddr, SocketAddr};
 use std::str::FromStr;
 
 #[derive(Debug, PartialEq, Eq)]
@@ -62,7 +62,6 @@ impl From<SocketAddr> for Interface {
 #[derive(Debug, PartialEq, Eq)]
 enum Parser {
     Begin,
-    Quote,
     OpenBracket,
     CloseBracket,
     Colon,
@@ -75,37 +74,26 @@ impl FromStr for Interface {
         if s.eq_ignore_ascii_case("unknown") || s.eq_ignore_ascii_case(r#""unknown""#) {
             return Ok(Self::Unknown);
         }
-        let s_trimmed = s.trim();
+        let s_trimmed = s.trim().trim_matches('"');
         if let Ok(simple) = s_trimmed.parse::<SocketAddr>() {
             return Ok(Self::Socket(simple));
         };
-        if let Ok(simple) = s_trimmed.parse::<Ipv4Addr>() {
+        if let Ok(simple) = s_trimmed.parse::<IpAddr>() {
             return Ok(Self::Socket(SocketAddr::from((simple, 0))));
         };
-        let mut ipv6_start = 0;
-        let mut ipv6_end = 0;
+        let mut ip_start = 0;
+        let mut ip_end = 0;
         let mut port_start = 0;
-        let mut port_end = 0;
         let mut state = Parser::Begin;
         let chars = s_trimmed.chars().enumerate();
         for (index, c) in chars {
             match (c, &state) {
-                ('"', Parser::Begin) => {
-                    state = Parser::Quote;
-                }
-                ('"', Parser::Quote) => {
-                    break;
-                }
-                ('"', Parser::Colon) => {
-                    port_end = index;
-                    break;
-                }
-                ('[', Parser::Quote) => {
-                    ipv6_start = index + 1;
+                ('[', Parser::Begin) => {
+                    ip_start = index + 1;
                     state = Parser::OpenBracket;
                 }
                 (']', Parser::OpenBracket) => {
-                    ipv6_end = index;
+                    ip_end = index;
                     state = Parser::CloseBracket;
                 }
                 (':', Parser::CloseBracket) => {
@@ -115,13 +103,13 @@ impl FromStr for Interface {
                 _ => {}
             }
         }
-        let ipv6: Option<Ipv6Addr> = s
-            .get(ipv6_start..ipv6_end)
-            .and_then(|ip| ip.parse::<Ipv6Addr>().ok());
-        let port: Option<u16> = s
-            .get(port_start..port_end)
+        let ip: Option<IpAddr> = s_trimmed
+            .get(ip_start..ip_end)
+            .and_then(|ip| ip.parse::<IpAddr>().ok());
+        let port: Option<u16> = s_trimmed
+            .get(port_start..)
             .and_then(|p| p.parse::<u16>().ok());
-        match (ipv6, port) {
+        match (ip, port) {
             (Some(ip), Some(port)) => Ok(Self::Socket(SocketAddr::from((ip, port)))),
             (Some(ip), None) => Ok(Self::Socket(SocketAddr::from((ip, 0)))),
             _ => Ok(Self::Identifier(String::from(s_trimmed.trim_matches('"')))),
