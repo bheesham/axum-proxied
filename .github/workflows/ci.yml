@@ -3,6 +3,8 @@ name: ci
 on:
   push:
   pull_request:
+  release:
+    types: [published]
 
 jobs:
   ci:
@@ -42,8 +44,13 @@ jobs:
       - name: Lint (format)
         id: lint-fmt
         run: cargo fmt --check
-        continue-on-error: true
       - name: Lint (clippy)
         id: lint-clippy
         run: cargo clippy --offline
-        continue-on-error: true
+      - name: Publish crate
+        if: ${{ github.event_name == 'release' && ! github.event.release.prerelease && ! github.event.release.draft && matrix.version == 'stable' }}
+        id: publish-crate
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: |
+          cargo publish
