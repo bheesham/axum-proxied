@@ -8,7 +8,11 @@ Features:
 
 * Extractors for `Forwarded` and `X-Forwarded-For` ([example][ex-extract]);
   and
-* a [PROXY v1][proxy] TCP listener ([example][ex-proxy]).
+* a [PROXY][proxy] TCP listener ([example][ex-proxy]).
+
+## Disclaimer
+
+I don't actually use this, I just wrote it for fun.
 
 ## License
 
