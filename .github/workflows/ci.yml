@@ -6,6 +6,9 @@ on:
 
 jobs:
   ci:
+    strategy:
+      matrix:
+        version: [stable, nightly]
     runs-on: ubuntu-24.04
     outputs:
       image: ${{ steps.build.outputs.image }}
@@ -15,6 +18,13 @@ jobs:
         run: |
           sudo apt-get update -qqq
           sudo apt-get install -yqqq haproxy
+      - name: Install Rust
+        id: install-rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.version }}
+          profile: minimal
+          components: rustfmt, clippy
       - name: Check out the repository to the runner
         uses: actions/checkout@v4  
       - name: Build
@@ -29,3 +39,11 @@ jobs:
       - name: Test PROXY v2
         id: test-proxy-v2
         run: sh ci/proxy-v2.sh
+      - name: Lint (format)
+        id: lint-fmt
+        run: cargo fmt --check
+        continue-on-error: true
+      - name: Lint (clippy)
+        id: lint-clippy
+        run: cargo clippy --offline
+        continue-on-error: true
