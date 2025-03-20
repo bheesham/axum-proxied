@@ -23,5 +23,5 @@ Licensed under whichever suits you best:
 
 [axum]: https://github.com/tokio-rs/axum
 [proxy]: https://www.haproxy.org/download/1.8/doc/proxy-protocol.txt
-[ex-extract]: examples/extract.rs
-[ex-proxy]: examples/proxy.rs
+[ex-extract]: https://github.com/bheesham/axum-proxied/blob/master/examples/extract.rs
+[ex-proxy]: https://github.com/bheesham/axum-proxied/blob/master/examples/proxy.rs
