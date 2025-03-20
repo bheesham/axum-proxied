@@ -10,6 +10,11 @@ jobs:
     outputs:
       image: ${{ steps.build.outputs.image }}
     steps:
+      - name: Install dependencies
+        id: install-dependencies
+        run: |
+          sudo apt-get update -qqq
+          sudo apt-get install -yqqq haproxy
       - name: Check out the repository to the runner
         uses: actions/checkout@v4  
       - name: Build
@@ -18,6 +23,9 @@ jobs:
       - name: Test extract
         id: test-extract
         run: sh ci/extract.sh
-      - name: Test proxy
-        id: test-proxy
-        run: sh ci/proxy.sh
+      - name: Test PROXY v1
+        id: test-proxy-v1
+        run: sh ci/proxy-v1.sh
+      - name: Test PROXY v2
+        id: test-proxy-v2
+        run: sh ci/proxy-v2.sh

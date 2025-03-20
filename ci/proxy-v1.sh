@@ -7,7 +7,7 @@ echo "running proxy example ($SERVER_PID)"
 sleep 3
 
 set +e
-sh dev/test-proxy.sh
+sh dev/test-proxy-v1.sh
 STATUS=$?
 set -e
 

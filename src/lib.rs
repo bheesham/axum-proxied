@@ -10,3 +10,6 @@
 //! [proxy]: https://www.haproxy.org/download/1.8/doc/proxy-protocol.txt
 pub mod extract;
 pub mod proxy;
+
+#[doc(hidden)]
+pub(crate) mod parser;
