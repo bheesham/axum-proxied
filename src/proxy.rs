@@ -6,7 +6,7 @@ use std::net::{Ipv4Addr, SocketAddr};
 use tokio::io::{self, AsyncReadExt};
 use tokio::net::{TcpListener, TcpStream};
 
-use crate::parser::{parse, ParseResult, Where};
+use crate::parser::{ParseResult, Where, parse};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Addr {
@@ -54,17 +54,13 @@ pub struct Listener {
 
 impl Listener {
     pub async fn new(listener: TcpListener) -> Self {
-        Self {
-            listener,
-        }
+        Self { listener }
     }
 }
 
 impl From<TcpListener> for Listener {
     fn from(value: TcpListener) -> Self {
-        Self {
-            listener: value,
-        }
+        Self { listener: value }
     }
 }
 
@@ -98,17 +94,25 @@ impl serve::Listener for Listener {
                         }
                         continue;
                     };
-                    (advance_by, source, SocketAddr::from((Ipv4Addr::UNSPECIFIED, 0)))
-                },
-                Ok(ParseResult(advance_by, Where::Header { source, destination })) => {
-                    (advance_by, source, destination)
-                },
+                    (
+                        advance_by,
+                        source,
+                        SocketAddr::from((Ipv4Addr::UNSPECIFIED, 0)),
+                    )
+                }
+                Ok(ParseResult(
+                    advance_by,
+                    Where::Header {
+                        source,
+                        destination,
+                    },
+                )) => (advance_by, source, destination),
                 Err(e) => {
                     if cfg!(feature = "tracing") {
                         tracing::warn!("could not parse PROXY information {e:?}");
                     }
                     continue;
-                },
+                }
             };
             // First, try advancing the stream.
             let Ok(read) = stream.read(&mut header_buf[..advance_by]).await else {

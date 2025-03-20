@@ -292,7 +292,7 @@ fn parse_v2(buf: &[u8]) -> Result<ParseResult, Error> {
         (_, Family::Inet6, _) => parse_v2_inet6(&buf[contents_start..])?,
     };
     // In the future, consider using _addresses_length to parse the extended headers.
-    
+
     Ok(ParseResult(
         header_end,
         Where::Header {
