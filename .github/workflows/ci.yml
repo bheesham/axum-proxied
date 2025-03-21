@@ -8,10 +8,10 @@ on:
 
 jobs:
   ci:
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         version: [stable, nightly]
-    runs-on: ubuntu-24.04
     outputs:
       image: ${{ steps.build.outputs.image }}
     steps:
@@ -28,7 +28,7 @@ jobs:
           profile: minimal
           components: rustfmt, clippy
       - name: Check out the repository to the runner
-        uses: actions/checkout@v4  
+        uses: actions/checkout@v4
       - name: Build
         id: build
         run: cargo b --examples
@@ -47,10 +47,35 @@ jobs:
       - name: Lint (clippy)
         id: lint-clippy
         run: cargo clippy --offline
-      - name: Publish crate
-        if: ${{ github.event_name == 'release' && ! github.event.release.prerelease && ! github.event.release.draft && matrix.version == 'stable' }}
-        id: publish-crate
-        env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        run: |
-          cargo publish
+      - name: Cache
+        if: ${{ (github.event_name == 'release' && ! github.event.release.prerelease && ! github.event.release.draft) || matrix.version == 'nightly' }}
+        id: cache
+        uses: actions/upload-artifact@v4
+        with:
+          name: target-${{ matrix.version }}
+          path: target
+          compression-level: 0
+          retention-days: 1
+  publish:
+    runs-on: ubuntu-24.04
+    if: ${{ github.event_name == 'release' && ! github.event.release.prerelease && ! github.event.release.draft }}
+    steps:
+    - name: Install Rust
+      id: install-rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        profile: minimal
+    - name: Check out the repository to the runner
+      uses: actions/checkout@v4
+    - name: Cache
+      uses: actions/download-artifact@v4
+      with:
+        name: target-stable
+        merge-multiple: true
+    - name: Publish crate
+      id: publish-crate
+      env:
+        CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+      run: |
+        cargo publish
