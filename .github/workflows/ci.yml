@@ -55,36 +55,36 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [ci]
     steps:
-    - name: Install Rust
-      run: rustup default nightly
-    - name: Install cargo-fuzz
-      run: cargo install cargo-fuzz
-    - name: Check out the repository to the runner
-      uses: actions/checkout@v4
-    - name: Cache
-      uses: actions/download-artifact@v4
-      with:
-        name: target-nightly
-        merge-multiple: true
-    - name: Fuzz
-      run: sh ci/fuzz.sh
+      - name: Install Rust
+        run: rustup default nightly
+      - name: Install cargo-fuzz
+        run: cargo install cargo-fuzz
+      - name: Check out the repository to the runner
+        uses: actions/checkout@v4
+      - name: Cache
+        uses: actions/download-artifact@v4
+        with:
+          name: target-nightly
+          merge-multiple: true
+      - name: Fuzz
+        run: sh ci/fuzz.sh
   publish:
     runs-on: ubuntu-24.04
     needs: [ci, fuzz]
     if: ${{ github.event_name == 'release' && ! github.event.release.prerelease && ! github.event.release.draft }}
     steps:
-    - name: Install Rust
-      run: rustup default stable
-    - name: Check out the repository to the runner
-      uses: actions/checkout@v4
-    - name: Cache
-      uses: actions/download-artifact@v4
-      with:
-        name: target-stable
-        merge-multiple: true
-    - name: Publish crate
-      id: publish-crate
-      env:
-        CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-      run: |
-        cargo publish
+      - name: Install Rust
+        run: rustup default stable
+      - name: Check out the repository to the runner
+        uses: actions/checkout@v4
+      - name: Cache
+        uses: actions/download-artifact@v4
+        with:
+          name: target-stable
+          merge-multiple: true
+      - name: Publish crate
+        id: publish-crate
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: |
+          cargo publish
