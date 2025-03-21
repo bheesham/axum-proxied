@@ -1,0 +1,28 @@
+[package]
+name = "axum-proxied-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2024"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+
+[dependencies.axum-proxied]
+path = ".."
+
+[[bin]]
+name = "proxy_parse"
+path = "fuzz_targets/proxy_parse.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "extract_forwarded_interface"
+path = "fuzz_targets/extract_forwarded_interface.rs"
+test = false
+doc = false
+bench = false
