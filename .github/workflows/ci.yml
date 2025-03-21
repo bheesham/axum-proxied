@@ -21,13 +21,7 @@ jobs:
           sudo apt-get update -qqq
           sudo apt-get install -yqqq haproxy
       - name: Install Rust
-        id: install-rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: ${{ matrix.version }}
-          profile: minimal
-          components: rustfmt, clippy
-          override: true
+        run: rustup default ${{ matrix.version }}
       - name: Check out the repository to the runner
         uses: actions/checkout@v4
       - name: Build
@@ -62,12 +56,7 @@ jobs:
     needs: [ci]
     steps:
     - name: Install Rust
-      id: install-rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: nightly
-        profile: minimal
-        override: true
+      run: rustup default nightly
     - name: Install cargo-fuzz
       run: cargo install cargo-fuzz
     - name: Check out the repository to the runner
@@ -85,12 +74,7 @@ jobs:
     if: ${{ github.event_name == 'release' && ! github.event.release.prerelease && ! github.event.release.draft }}
     steps:
     - name: Install Rust
-      id: install-rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        profile: minimal
-        override: true
+      run: rustup default stable
     - name: Check out the repository to the runner
       uses: actions/checkout@v4
     - name: Cache
