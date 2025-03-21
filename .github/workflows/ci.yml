@@ -37,9 +37,11 @@ jobs:
         id: test-proxy-v2
         run: sh ci/proxy-v2.sh
       - name: Lint (format)
+        if: ${{ matrix.version == 'stable' }}
         id: lint-fmt
         run: cargo fmt --check
       - name: Lint (clippy)
+        if: ${{ matrix.version == 'stable' }}
         id: lint-clippy
         run: cargo clippy --offline
       - name: Cache
