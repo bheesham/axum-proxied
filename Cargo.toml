@@ -30,3 +30,11 @@ tracing = ["dep:tracing", "axum/tracing", "tokio/tracing"]
 
 [dev-dependencies]
 tokio = { version = "1.44.1", features = ["rt-multi-thread", "macros"] }
+
+[[example]]
+name = "proxy"
+doc-scrape-examples = true
+
+[[example]]
+name = "extract"
+doc-scrape-examples = true
