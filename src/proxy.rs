@@ -6,7 +6,8 @@ use std::net::{Ipv4Addr, SocketAddr};
 use tokio::io::{self, AsyncReadExt};
 use tokio::net::{TcpListener, TcpStream};
 
-use crate::parser::{ParseResult, Where, parse};
+#[doc(hidden)]
+pub mod parser;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Addr {
@@ -86,8 +87,8 @@ impl serve::Listener for Listener {
                 }
                 continue;
             };
-            let (advance_by, source, destination) = match parse(&header_buf[..read]) {
-                Ok(ParseResult(advance_by, Where::Underlying)) => {
+            let (advance_by, source, destination) = match parser::parse(&header_buf[..read]) {
+                Ok(parser::ParseResult(advance_by, parser::Where::Underlying)) => {
                     let Ok(source) = stream.peer_addr() else {
                         if cfg!(feature = "tracing") {
                             tracing::warn!("could not read source from peer addr");
@@ -100,9 +101,9 @@ impl serve::Listener for Listener {
                         SocketAddr::from((Ipv4Addr::UNSPECIFIED, 0)),
                     )
                 }
-                Ok(ParseResult(
+                Ok(parser::ParseResult(
                     advance_by,
-                    Where::Header {
+                    parser::Where::Header {
                         source,
                         destination,
                     },

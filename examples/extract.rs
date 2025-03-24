@@ -2,8 +2,8 @@ use axum::{Router, routing::get};
 use axum_proxied::extract;
 
 async fn handler(
-    forwarded: Option<extract::forwarded::Forwarded>,
-    xforwarded: Option<extract::xforwardedfor::XForwardedFor>,
+    forwarded: Option<extract::Forwarded>,
+    xforwarded: Option<extract::XForwardedFor>,
 ) -> String {
     if let Some(ref forwarded) = forwarded {
         println!("forwarded: first: {:?}", forwarded.forwards().first());
