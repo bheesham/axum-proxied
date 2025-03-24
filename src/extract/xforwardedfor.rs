@@ -13,7 +13,7 @@ use std::net::IpAddr;
 /// Example:
 ///
 /// ```rust
-/// use axum_proxied::extract::xforwardedfor::XForwardedFor;
+/// use axum_proxied::extract::XForwardedFor;
 ///
 /// async fn handler(xforwarded: Option<XForwardedFor>) {
 ///     todo!()

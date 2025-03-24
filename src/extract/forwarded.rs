@@ -10,14 +10,15 @@ use std::convert::Infallible;
 use std::net::{IpAddr, SocketAddr};
 use std::str::FromStr;
 
+/// The protocol which initiated the request.
 #[derive(Debug, PartialEq, Eq)]
-pub enum Proto {
+pub enum Protocol {
     Http,
     Https,
     Other(String),
 }
 
-impl FromStr for Proto {
+impl FromStr for Protocol {
     type Err = Infallible;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -117,12 +118,17 @@ impl FromStr for Interface {
     }
 }
 
+/// A single "forwarded" entry. All fields are optional, as per the spec.
 #[derive(Debug, PartialEq, Eq)]
 pub struct Forward {
+    /// The forwarder (proxy server).
     by: Option<Interface>,
+    /// The request initiator.
     r#for: Option<Interface>,
+    /// `Host` header, as seen by the proxy.
     host: Option<String>,
-    proto: Option<Proto>,
+    /// The protocol used during this forward. 
+    proto: Option<Protocol>,
 }
 
 impl Forward {
@@ -130,7 +136,7 @@ impl Forward {
         by: Option<Interface>,
         r#for: Option<Interface>,
         host: Option<String>,
-        proto: Option<Proto>,
+        proto: Option<Protocol>,
     ) -> Self {
         Self {
             by,
@@ -152,7 +158,7 @@ impl Forward {
         &self.host
     }
 
-    pub fn proto(&self) -> &Option<Proto> {
+    pub fn proto(&self) -> &Option<Protocol> {
         &self.proto
     }
 }
@@ -162,7 +168,7 @@ impl Forward {
 /// Example:
 ///
 /// ```rust
-/// use axum_proxied::extract::forwarded::Forwarded;
+/// use axum_proxied::extract::Forwarded;
 ///
 /// async fn handler(forwarded: Option<Forwarded>) {
 ///     todo!()
@@ -216,7 +222,7 @@ where
             let mut by: Option<Interface> = None;
             let mut r#for: Option<Interface> = None;
             let mut host: Option<String> = None;
-            let mut proto: Option<Proto> = None;
+            let mut proto: Option<Protocol> = None;
             for mut params in forward_raw.by_ref() {
                 while let (Some(keyword), Some(value)) = (
                     params.next().map(|s| s.trim()),
@@ -229,7 +235,7 @@ where
                     } else if keyword.eq_ignore_ascii_case("host") {
                         host = Some(String::from(value.trim()));
                     } else if keyword.eq_ignore_ascii_case("proto") {
-                        proto = value.trim().parse::<Proto>().ok();
+                        proto = value.trim().parse::<Protocol>().ok();
                     }
                 }
             }
@@ -266,7 +272,7 @@ mod tests {
                         r#""[::0]:443""#.parse::<Interface>().ok(),
                         "127.0.0.1:0".parse::<Interface>().ok(),
                         None,
-                        Some(Proto::Https),
+                        Some(Protocol::Https),
                     ),
                     Forward::new(None, "5.5.5.5:444".parse::<Interface>().ok(), None, None,),
                 ]
