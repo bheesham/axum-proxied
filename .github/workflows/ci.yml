@@ -67,7 +67,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: target-nightly
-          merge-multiple: true
+          path: target
       - name: Fuzz
         run: sh ci/fuzz.sh
   publish:
@@ -83,7 +83,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: target-stable
-          merge-multiple: true
+          path: target
       - name: Publish crate
         id: publish-crate
         env:
