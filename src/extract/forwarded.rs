@@ -127,7 +127,7 @@ pub struct Forward {
     r#for: Option<Interface>,
     /// `Host` header, as seen by the proxy.
     host: Option<String>,
-    /// The protocol used during this forward. 
+    /// The protocol used during this forward.
     proto: Option<Protocol>,
 }
 
