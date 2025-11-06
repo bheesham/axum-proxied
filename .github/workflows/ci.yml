@@ -27,6 +27,9 @@ jobs:
       - name: Build
         id: build
         run: cargo b --examples
+      - name: Unit tests
+        id: test-unit
+        run: cargo t
       - name: Test extract
         id: test-extract
         run: sh ci/extract.sh
