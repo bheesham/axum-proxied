@@ -24,6 +24,7 @@ pub struct XForwardedFor {
     forwards: Vec<IpAddr>,
 }
 
+/// The header's gotta be at least UTF-8.
 #[derive(Debug, PartialEq, Eq)]
 pub struct XForwardedForRejection(&'static str);
 
@@ -34,10 +35,12 @@ impl IntoResponse for XForwardedForRejection {
 }
 
 impl XForwardedFor {
+    /// A new one...
     pub fn new(forwards: Vec<std::net::IpAddr>) -> Self {
         Self { forwards }
     }
 
+    /// A list of [`IpAddr`]s.
     pub fn forwards(&self) -> &Vec<IpAddr> {
         &self.forwards
     }

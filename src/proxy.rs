@@ -9,6 +9,8 @@ use tokio::net::{TcpListener, TcpStream};
 #[doc(hidden)]
 pub mod parser;
 
+/// The stuff we've parsed from the PROXY Protocol. We don't support Unix domain
+/// sockets.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Addr {
     source: SocketAddr,

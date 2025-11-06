@@ -13,8 +13,11 @@ use std::str::FromStr;
 /// The protocol which initiated the request.
 #[derive(Debug, PartialEq, Eq)]
 pub enum Protocol {
+    /// Regular HTTP
     Http,
+    /// HTTPS
     Https,
+    /// Some other protocol
     Other(String),
 }
 
@@ -119,7 +122,7 @@ impl FromStr for Interface {
 }
 
 /// A single "forwarded" entry. All fields are optional, as per the spec.
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Default, PartialEq, Eq)]
 pub struct Forward {
     /// The forwarder (proxy server).
     by: Option<Interface>,
@@ -132,6 +135,7 @@ pub struct Forward {
 }
 
 impl Forward {
+    /// Note that the default is an empty struct.
     pub fn new(
         by: Option<Interface>,
         r#for: Option<Interface>,
@@ -146,18 +150,22 @@ impl Forward {
         }
     }
 
+    /// Upstream proxy.
     pub fn by(&self) -> &Option<Interface> {
         &self.by
     }
 
+    /// Initiator of the request.
     pub fn r#for(&self) -> &Option<Interface> {
         &self.r#for
     }
 
+    /// `Host`, as received by the upstream.
     pub fn host(&self) -> &Option<String> {
         &self.host
     }
 
+    /// Protocol.
     pub fn proto(&self) -> &Option<Protocol> {
         &self.proto
     }
@@ -180,15 +188,18 @@ pub struct Forwarded {
 }
 
 impl Forwarded {
+    /// A new one...
     pub fn new(forwards: Vec<Forward>) -> Self {
         Self { forwards }
     }
 
+    /// A list of [`Forward`]s.
     pub fn forwards(&self) -> &Vec<Forward> {
         &self.forwards
     }
 }
 
+/// The header's gotta be at least UTF-8.
 #[derive(Debug, PartialEq, Eq)]
 pub struct ForwardedRejection(&'static str);
 
